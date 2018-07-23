@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Default Attributes"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+
+    <com.mmbarno.dotsloader.DotsLoader
+        android:id="@+id/dot_loader_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Circle Loader (Custom Attributes)"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+
+    <com.mmbarno.dotsloader.DotsLoader
+        android:id="@+id/dot_loader_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:dotsColor="@color/colorAccent"
+        app:dotsSize="20dp"
+        app:dotsCount="4"
+        app:dotsStrokeWidth="2dp"
+        app:dotsSpacing="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Rectangle Loader (Custom Attributes)"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+
+    <com.mmbarno.dotsloader.DotsLoader
+        android:id="@+id/dot_loader_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:dotsColor="@color/colorPrimary"
+        app:dotsSize="20dp"
+        app:dotsCount="5"
+        app:dotsStrokeWidth="2dp"
+        app:dotsSpacing="10dp"
+        app:dotsCornerRadius="4dp"/>
+
+</LinearLayout>
