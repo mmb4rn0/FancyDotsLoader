@@ -20,7 +20,7 @@ Grab via gradle-
   Step 2. Add the dependency 
   ```grovy	
    dependencies {
-	        implementation 'com.github.mmb4rn0:FancyDotsLoader:v1.0.0'
+	        implementation 'com.github.mmb4rn0:FancyDotsLoader:v1.1.0'
 	}
   ```
 or via Maven-
@@ -38,7 +38,7 @@ or via Maven-
    <dependency>
 	    <groupId>com.github.mmb4rn0</groupId>
 	    <artifactId>FancyDotsLoader</artifactId>
-	    <version>v1.0.0</version>
+	    <version>v1.1.0</version>
 	</dependency>
   ```
 
@@ -49,12 +49,13 @@ or via Maven-
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:dotsColor="@color/colorPrimary"
-        app:dotsSize="20dp"
-        app:dotsCount="5"
-        app:dotsStrokeWidth="2dp"
-        app:dotsSpacing="10dp"
-        app:dotsCornerRadius="4dp"/>
+        app:dots_color="@color/colorAccent"
+        app:dots_size="20dp"
+        app:dots_count="4"
+        app:dots_stroke_width="2dp"
+        app:dots_spacing="8dp"
+        app:dots_corner_radius="4dp"
+        app:dots_transition_duration="650"/>
    ```
    
    # License
