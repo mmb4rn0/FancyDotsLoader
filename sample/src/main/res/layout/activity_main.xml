@@ -8,56 +8,67 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Default Attributes"
-        android:textColor="#000000"
-        android:textSize="20sp" />
-
     <com.mmbarno.dotsloader.DotsLoader
-        android:id="@+id/dot_loader_1"
+        android:id="@+id/dot_loader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
+        android:padding="10dp"
+        app:dots_color="@color/colorAccent"
+        app:dots_size="30dp"
+        app:dots_count="4"
+        app:dots_stroke_width="2dp"
+        app:dots_spacing="8dp"
+        app:dots_transition_duration="650"/>
 
-    <TextView
+    <Button
+        android:id="@+id/btn1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Circle Loader (Custom Attributes)"
-        android:textColor="#000000"
-        android:textSize="20sp" />
+        android:text="Count"
+        android:layout_marginTop="20dp"/>
 
-    <com.mmbarno.dotsloader.DotsLoader
-        android:id="@+id/dot_loader_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:dotsColor="@color/colorAccent"
-        app:dotsSize="20dp"
-        app:dotsCount="4"
-        app:dotsStrokeWidth="2dp"
-        app:dotsSpacing="8dp"/>
 
-    <TextView
+    <Button
+        android:id="@+id/btn2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="Rectangle Loader (Custom Attributes)"
-        android:textColor="#000000"
-        android:textSize="20sp" />
+        android:text="Color"
+        android:layout_marginTop="10dp"/>
 
-    <com.mmbarno.dotsloader.DotsLoader
-        android:id="@+id/dot_loader_3"
+    <Button
+        android:id="@+id/btn3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:dotsColor="@color/colorPrimary"
-        app:dotsSize="20dp"
-        app:dotsCount="5"
-        app:dotsStrokeWidth="2dp"
-        app:dotsSpacing="10dp"
-        app:dotsCornerRadius="4dp"/>
+        android:text="Size"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Space"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Radius"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stroke"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/btn7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration"
+        android:layout_marginTop="10dp"/>
+
 
 </LinearLayout>

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="DotsLoader">
-        <attr name="dotsColor" format="color" />
-        <attr name="dotsSize" format="dimension" />
-        <attr name="dotsSpacing" format="dimension" />
-        <attr name="dotsCornerRadius" format="dimension" />
-        <attr name="dotsStrokeWidth" format="dimension" />
-        <attr name="dotsCount" format="integer" />
+        <attr name="dots_color" format="color" />
+        <attr name="dots_size" format="dimension" />
+        <attr name="dots_spacing" format="dimension" />
+        <attr name="dots_corner_radius" format="dimension" />
+        <attr name="dots_stroke_width" format="dimension" />
+        <attr name="dots_count" format="integer" />
+        <attr name="dots_transition_duration" format="integer" />
     </declare-styleable>
 </resources>

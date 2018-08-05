@@ -1,48 +1,19 @@
 package com.mmbarno.dotsloader;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
+import android.graphics.Canvas;
+import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by mmbarno on 7/23/18.
  * Email: manzur.mehedi@gagagugu.com
  */
-@SuppressWarnings("SuspiciousNameCombination")
-public class DotsLoader extends LinearLayout {
-    private static final int DEFAULT_DOT_COUNT = 5;
+@SuppressWarnings("ALL")
+public class DotsLoader extends View implements DotsLoaderManager.AnimationListener {
 
-    private List<View> mIndicatorDots;
-
-    // Attributes
-    private int mDotsSize;
-    private int mDotsSpacing;
-    private int mDotsStrokeWidth;
-    private int mDotsCornerRadius;
-    private int mDotsColor;
-    private int mDotsCount = DEFAULT_DOT_COUNT;
-
-    private boolean isAttributeChanged;
-
-    private int animationIterationCount;
-    private int visibility;
-
-    private Animation animation;
-    private View mIndicatorDot;
-    private int mIndicatorDotCornerRadius;
+    private DotsLoaderManager loaderManager;
 
     public DotsLoader(Context context) {
         this(context, null);
@@ -54,267 +25,166 @@ public class DotsLoader extends LinearLayout {
 
     public DotsLoader(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(attrs);
+        init(context, attrs);
     }
 
-    private void init(AttributeSet attrs) {
-        mIndicatorDots = new ArrayList<>();
-
-        setOrientation(HORIZONTAL);
-        setGravity(Gravity.CENTER);
-
-        mDotsSize = dpToPx(16); // 16dp
-        mDotsSpacing = dpToPx(4); // 4dp
-        mDotsStrokeWidth = dpToPx(2); // 2dp
-        mDotsCornerRadius = mDotsSize / 2; // 1dp additional to fill the stroke dots
-        mDotsColor = Color.parseColor("#000000");
-
-        if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.DotsLoader);
-
-            // Dots attributes
-            mDotsColor = a.getColor(R.styleable.DotsLoader_dotsColor, mDotsColor);
-            mDotsSize = (int) a.getDimension(R.styleable.DotsLoader_dotsSize, mDotsSize);
-            mDotsSpacing = (int) a.getDimension(R.styleable.DotsLoader_dotsSpacing, mDotsSpacing);
-            mDotsCornerRadius = (int) a.getDimension(R.styleable.DotsLoader_dotsCornerRadius, mDotsSize / 2);
-
-            // Spring dots attributes
-            mDotsStrokeWidth = (int) a.getDimension(R.styleable.DotsLoader_dotsStrokeWidth, mDotsStrokeWidth);
-            mDotsCount = a.getInt(R.styleable.DotsLoader_dotsCount, DEFAULT_DOT_COUNT);
-
-            a.recycle();
-        }
-        int fillDotsSize = mDotsSize - mDotsStrokeWidth * 2;
-        mIndicatorDotCornerRadius = (mDotsCornerRadius * fillDotsSize) / mDotsSize;
-
-        addDots();
-    }
-
-    private void addDots() {
-        for (int i = 0; i < mDotsCount; i++) {
-            ViewGroup dot = buildDot(i);
-            addView(dot);
-        }
-    }
-
-    private FrameLayout buildDot(int count) {
-        FrameLayout dot = new FrameLayout(getContext());
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(mDotsSize, mDotsSize);
-        layoutParams.setMargins(0, 0, count < mDotsCount - 1 ? mDotsSpacing : 0, 0);
-        dot.setPadding(mDotsStrokeWidth, mDotsStrokeWidth, mDotsStrokeWidth, mDotsStrokeWidth);
-        dot.setLayoutParams(layoutParams);
-
-        GradientDrawable dotBackground = new GradientDrawable();
-        dotBackground.setCornerRadius(mDotsCornerRadius);
-        dotBackground.setStroke(mDotsStrokeWidth, mDotsColor);
-        dot.setBackground(dotBackground);
-
-        setUpFillDot(count, dot);
-        return dot;
-    }
-
-    private void setUpFillDot(int count, ViewGroup dot) {
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        View fillDotView = new View(getContext());
-        GradientDrawable dotBackground = new GradientDrawable();
-        dotBackground.setCornerRadius(mIndicatorDotCornerRadius);
-        dotBackground.setColor(mDotsColor);
-        fillDotView.setBackground(dotBackground);
-        fillDotView.setVisibility(count == animationIterationCount ? VISIBLE : GONE);
-        fillDotView.setLayoutParams(params);
-        dot.addView(fillDotView);
-        mIndicatorDots.add(fillDotView);
-    }
-
-    private void removeDots() {
-        removeAllViews();
+    private void init(Context context, AttributeSet attrs) {
+        loaderManager = new DotsLoaderManager(context, attrs, this);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        refreshDots(true);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        stopDotsAnimators(true);
+        if (loaderManager != null) {
+            loaderManager.animator().cancel();
+        }
     }
 
     @Override
-    public void setVisibility(int visibility) {
-        super.setVisibility(visibility);
-        if (this.visibility == visibility) {
-            return;
-        }
-        this.visibility = visibility;
-        visibilityChanged();
-    }
-
-    private void visibilityChanged() {
-        if (getVisibility() == VISIBLE) {
-            refreshDots(true);
-        } else {
-            stopDotsAnimators(true);
+    public void requestLayout() {
+        super.requestLayout();
+        if (loaderManager != null) {
+            loaderManager.animator().cancel();
         }
     }
 
-    private void refreshDots(final boolean reset) {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                stopDotsAnimators(reset);
-                if (getChildCount() == 0 || mIndicatorDots.isEmpty() || isAttributeChanged) {
-                    mIndicatorDots.clear();
-                    removeDots();
-                    addDots();
+    private int reconcileSize(int measureSpec, int desiredSize) {
+        final int mode = MeasureSpec.getMode(measureSpec);
+        final int measuredSize = MeasureSpec.getSize(measureSpec);
+
+        switch (mode) {
+            case MeasureSpec.EXACTLY:
+                return measuredSize;
+            case MeasureSpec.AT_MOST:
+                return Math.min(measuredSize, desiredSize);
+            case MeasureSpec.UNSPECIFIED:
+            default:
+                return desiredSize;
+        }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        loaderManager.dotsData().container.measureContainerWidthAndHeight();
+        final int desiredWidth = loaderManager.dotsData().container.width + getPaddingLeft() + getPaddingRight();
+        final int desiredHeight = loaderManager.dotsData().container.height + getPaddingTop() + getPaddingBottom();
+
+        final int measuredWidth = reconcileSize(widthMeasureSpec, desiredWidth);
+        final int measuredHeight = reconcileSize(heightMeasureSpec, desiredHeight);
+
+        loaderManager.dotsData().container.setUpDotsContainerProperties(measuredWidth, measuredHeight);
+        loaderManager.dotsData().setUpDots();
+        loaderManager.dotsData().styleData.setUpStyleData();
+
+        setMeasuredDimension(measuredWidth, measuredHeight);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        loaderManager.drawer().draw(canvas);
+        if (!loaderManager.animator().isAnimationRunning()) {
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    loaderManager.animator().animate();
+                    removeCallbacks(this);
                 }
-                isAttributeChanged = false;
-                initAnimation();
-                initFillDotState();
-                startDotsAnimators();
-            }
-        });
-    }
-
-    private void initAnimation() {
-        if (animation == null) {
-            animation = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in_out);
-            animation.setAnimationListener(animationListener);
+            });
         }
-    }
-
-    private void initFillDotState() {
-        for (int i = 0; i < mIndicatorDots.size(); i++) {
-            mIndicatorDots.get(i).setVisibility(i == animationIterationCount ? VISIBLE : GONE);
-        }
-    }
-
-    private void startDotsAnimators() {
-        if (getVisibility() != VISIBLE) {
-            return;
-        }
-        mIndicatorDot = mIndicatorDots.get(animationIterationCount);
-        mIndicatorDot.startAnimation(animation);
-        animationIterationCount++;
-        if (animationIterationCount >= mDotsCount) {
-            animationIterationCount = 0;
-        }
-    }
-
-    private void stopDotsAnimators(boolean reset) {
-        animationIterationCount = reset ? 0 : animationIterationCount;
-        if (mIndicatorDot != null) {
-            mIndicatorDot.animate().cancel();
-            mIndicatorDot.clearAnimation();
-            mIndicatorDot = null;
-        }
-        if (animation != null) {
-            animation.setAnimationListener(null);
-            animation = null;
-        }
-    }
-
-    private Animation.AnimationListener animationListener = new Animation.AnimationListener() {
-        @Override
-        public void onAnimationStart(Animation animation) {
-            mIndicatorDot.setVisibility(VISIBLE);
-        }
-
-        @Override
-        public void onAnimationEnd(Animation animation) {
-            mIndicatorDot.setVisibility(GONE);
-            animation.setDuration(400);
-            mIndicatorDot.clearAnimation();
-            startDotsAnimators();
-        }
-
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-            animation.setDuration(250);
-        }
-    };
-
-    private int dpToPx(int dp) {
-        return (int) (getContext().getResources().getDisplayMetrics().density * dp);
     }
 
     public int getDotsSize() {
-        return mDotsSize;
+        return loaderManager.dotsData().dotsSize;
     }
 
     public void setDotsSize(int dotsSize) {
-        if (this.mDotsSize == dotsSize) {
+        if (loaderManager.dotsData().dotsSize == dotsSize) {
             return;
         }
-        this.mDotsSize = dotsSize;
-        isAttributeChanged = true;
-        refreshDots(false);
+        loaderManager.dotsData().dotsSize = dotsSize;
+        requestLayout();
     }
 
     public int getDotsSpacing() {
-        return mDotsSpacing;
+        return loaderManager.dotsData().dotsSpacing;
     }
 
     public void setDotsSpacing(int dotsSpacing) {
-        if (this.mDotsSpacing == dotsSpacing) {
+        if (loaderManager.dotsData().dotsSpacing == dotsSpacing) {
             return;
         }
-        this.mDotsSpacing = dotsSpacing;
-        isAttributeChanged = true;
-        refreshDots(false);
+        loaderManager.dotsData().dotsSpacing = dotsSpacing;
+        requestLayout();
     }
 
     public int getDotsStrokeWidth() {
-        return mDotsStrokeWidth;
+        return loaderManager.dotsData().dotsStrokeWidth;
     }
 
     public void setDotsStrokeWidth(int dotsStrokeWidth) {
-        if (this.mDotsStrokeWidth == dotsStrokeWidth) {
+        if (loaderManager.dotsData().dotsStrokeWidth == dotsStrokeWidth) {
             return;
         }
-        this.mDotsStrokeWidth = dotsStrokeWidth;
-        isAttributeChanged = true;
-        refreshDots(false);
+        loaderManager.dotsData().dotsStrokeWidth = dotsStrokeWidth;
+        loaderManager.dotsData().changeDots();
+        loaderManager.dotsData().styleData.setUpStyleData();
     }
 
     public int getDotsCornerRadius() {
-        return mDotsCornerRadius;
+        return loaderManager.dotsData().dotsCornerRadius;
     }
 
     public void setDotsCornerRadius(int dotsCornerRadius) {
-        if (this.mDotsSpacing == dotsCornerRadius) {
+        if (loaderManager.dotsData().dotsCornerRadius == dotsCornerRadius) {
             return;
         }
-        this.mDotsCornerRadius = dotsCornerRadius;
-        isAttributeChanged = true;
-        refreshDots(false);
+        loaderManager.dotsData().dotsCornerRadius = dotsCornerRadius;
+        loaderManager.dotsData().changeDots();
     }
 
     public int getDotsColor() {
-        return mDotsColor;
+        return loaderManager.dotsData().dotsColor;
     }
 
-    public void setDotsColor(int dotsColor) {
-        if (this.mDotsColor == dotsColor) {
+    public void setDotsColor(@ColorInt int dotsColor) {
+        if (loaderManager.dotsData().dotsColor == dotsColor) {
             return;
         }
-        this.mDotsColor = dotsColor;
-        isAttributeChanged = true;
-        refreshDots(false);
+        loaderManager.dotsData().dotsColor = dotsColor;
+        loaderManager.dotsData().styleData.setUpStyleData();
     }
 
     public int getDotsCount() {
-        return mDotsCount;
+        return loaderManager.dotsData().dotsCount;
     }
 
     public void setDotsCount(int dotsCount) {
-        if (this.mDotsCount == dotsCount) {
+        if (loaderManager.dotsData().dotsCount == dotsCount) {
             return;
         }
-        this.mDotsCount = dotsCount;
-        isAttributeChanged = true;
-        refreshDots(true);
+        loaderManager.dotsData().dotsCount = dotsCount;
+        requestLayout();
+    }
+
+    public int getTransitionDuration() {
+        return loaderManager.dotsData().transitionDuration;
+    }
+
+    public void setTransitionDuration(int transitionDuration) {
+        if (loaderManager.dotsData().transitionDuration == transitionDuration) {
+            return;
+        }
+        loaderManager.dotsData().transitionDuration = transitionDuration;
+        loaderManager.animator().resetDuration();
+    }
+
+    @Override
+    public void onAnimationUpdate() {
+        invalidate();
     }
 }
