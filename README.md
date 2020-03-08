@@ -20,7 +20,7 @@ Grab via gradle-
   Step 2. Add the dependency 
   ```grovy	
    dependencies {
-	        implementation 'com.github.mmb4rn0:FancyDotsLoader:v1.1.0'
+	        implementation 'com.github.mmb4rn0:FancyDotsLoader:v2.0.0'
 	}
   ```
 or via Maven-
@@ -38,7 +38,7 @@ or via Maven-
    <dependency>
 	    <groupId>com.github.mmb4rn0</groupId>
 	    <artifactId>FancyDotsLoader</artifactId>
-	    <version>v1.1.0</version>
+	    <version>v2.0.0</version>
 	</dependency>
   ```
 
