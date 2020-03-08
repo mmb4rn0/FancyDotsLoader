@@ -2,7 +2,7 @@ package com.mmbarno.dotsloader;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.view.View;
 
